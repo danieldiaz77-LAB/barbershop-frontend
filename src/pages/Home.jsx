@@ -9,7 +9,6 @@ const BARBER_WORKING = 'https://images.unsplash.com/photo-1503951914875-452162b0
 const TOOLS_IMG     = 'https://images.unsplash.com/photo-1621605815971-fbc98d665033?crop=entropy&cs=srgb&fm=jpg&q=85&w=900';
 const INTERIOR_IMG  = 'https://images.unsplash.com/photo-1585747860715-2ba37e788b70?crop=entropy&cs=srgb&fm=jpg&q=85&w=900';
 
-/* Fotos reales de los maestros */
 const BARBER_FALLBACK_PHOTOS = [
   'https://dbarbers.cl/wp-content/uploads/2025/11/AAF05397-683x1024.jpg',
   'https://tse3.mm.bing.net/th/id/OIP.DXJL3MCQ8Lq3YHVMnuonIQHaHc?cb=thfvnextfalcon&rs=1&pid=ImgDetMain&o=7&rm=3',
@@ -41,14 +40,13 @@ export default function Home() {
           background: 'linear-gradient(to top, #0A0A0A, transparent)',
         }} />
 
-        {/* línea dorada vertical */}
-        <div style={{
+        <div className="hero-linea-vertical" style={{
           position: 'absolute', left: '60px', top: '15%', height: '70%',
           width: '1px',
           background: `linear-gradient(to bottom, transparent, ${gold} 30%, ${gold} 70%, transparent)`,
         }} />
 
-        <div className="fadeup" style={{
+        <div className="hero-content fadeup" style={{
           position: 'relative', zIndex: 10,
           maxWidth: '1200px', margin: '0 auto',
           padding: '160px 100px 120px',
@@ -60,10 +58,10 @@ export default function Home() {
             </span>
           </div>
 
-          <h1 style={{ fontFamily: "'Playfair Display', serif", fontSize: 'clamp(60px, 9vw, 120px)', fontWeight: '700', lineHeight: '0.92', letterSpacing: '-0.03em', color: '#F3F2EE', maxWidth: '650px', marginBottom: '0' }}>
+          <h1 style={{ fontFamily: "'Playfair Display', serif", fontSize: 'clamp(52px, 9vw, 120px)', fontWeight: '700', lineHeight: '0.92', letterSpacing: '-0.03em', color: '#F3F2EE', maxWidth: '650px', marginBottom: '0' }}>
             El arte
           </h1>
-          <h1 style={{ fontFamily: "'Playfair Display', serif", fontSize: 'clamp(60px, 9vw, 120px)', fontWeight: '700', lineHeight: '0.92', letterSpacing: '-0.03em', color: gold, fontStyle: 'italic', maxWidth: '650px', marginBottom: '36px' }}>
+          <h1 style={{ fontFamily: "'Playfair Display', serif", fontSize: 'clamp(52px, 9vw, 120px)', fontWeight: '700', lineHeight: '0.92', letterSpacing: '-0.03em', color: gold, fontStyle: 'italic', maxWidth: '650px', marginBottom: '36px' }}>
             del corte.
           </h1>
 
@@ -72,7 +70,7 @@ export default function Home() {
             Reserva tu hora en minutos y vive la experiencia.
           </p>
 
-          <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', marginBottom: '80px' }}>
+          <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', marginBottom: '60px' }}>
             <Link to="/reservar" className="btn-gold" style={{ padding: '16px 40px', fontSize: '13px' }}>
               Reservar ahora →
             </Link>
@@ -82,7 +80,7 @@ export default function Home() {
           </div>
 
           {/* métricas */}
-          <div style={{ display: 'flex', gap: '0' }}>
+          <div className="hero-metricas" style={{ display: 'flex', gap: '0' }}>
             {[
               ['10+', 'Años de oficio'],
               ['3',   'Maestros'],
@@ -104,8 +102,8 @@ export default function Home() {
       </section>
 
       {/* ══ BENTO GRID ══ */}
-      <section style={{ maxWidth: '1200px', margin: '0 auto', padding: '80px 40px' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.8fr 1fr', gridTemplateRows: '280px 280px', gap: '10px' }}>
+      <section style={{ maxWidth: '1200px', margin: '0 auto', padding: '80px 24px' }}>
+        <div className="bento-grid" style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.8fr 1fr', gridTemplateRows: '280px 280px', gap: '10px' }}>
 
           <div style={{ gridColumn: '1/2', gridRow: '1/3', position: 'relative', overflow: 'hidden', borderRadius: '4px' }}>
             <img src={INTERIOR_IMG} alt="Interior"
@@ -144,7 +142,7 @@ export default function Home() {
 
       {/* ══ SERVICIOS ══ */}
       <section style={{ background: '#080808', borderTop: '1px solid #161616', borderBottom: '1px solid #161616', padding: '100px 0' }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 40px' }}>
+        <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 24px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '56px', flexWrap: 'wrap', gap: '20px' }}>
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '14px' }}>
@@ -156,7 +154,7 @@ export default function Home() {
             <Link to="/servicios" className="btn-ghost" style={{ fontSize: '12px', padding: '12px 24px' }}>Ver todos →</Link>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0' }}>
+          <div className="servicios-home-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0' }}>
             {[
               { nombre: 'Corte Clásico',    desc: 'Tijera y máquina, lavado y peinado profesional.',  precio: '$28', duracion: '45 min', num: '01', icon: '✂' },
               { nombre: 'Arreglo Barba',    desc: 'Escultura de barba con toalla caliente y aceites.', precio: '$18', duracion: '30 min', num: '02', icon: '🪒' },
@@ -181,36 +179,18 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ══ BARBEROS — ESPECTACULAR ══ */}
+      {/* ══ BARBEROS ══ */}
       {barberos.length > 0 && (
         <section style={{ background: '#050505' }}>
+          <div className="barberos-layout" style={{ display: 'grid', gridTemplateColumns: '220px 1fr', borderTop: '1px solid #111' }}>
 
-          {/* ── TÍTULO lateral izquierdo pegado al borde ── */}
-          <div style={{ display: 'grid', gridTemplateColumns: '220px 1fr', borderTop: '1px solid #111' }}>
-
-            {/* columna izquierda — label vertical */}
-            <div style={{
-              borderRight: '1px solid #111',
-              display: 'flex', flexDirection: 'column',
-              justifyContent: 'space-between',
-              padding: '48px 32px',
-            }}>
+            <div style={{ borderRight: '1px solid #111', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', padding: '48px 32px' }}>
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '32px' }}>
                   <div style={{ width: '20px', height: '1px', background: gold }} />
-                  <span style={{ fontFamily: "'Oswald', sans-serif", fontSize: '9px', letterSpacing: '0.4em', color: gold, textTransform: 'uppercase' }}>
-                    Equipo
-                  </span>
+                  <span style={{ fontFamily: "'Oswald', sans-serif", fontSize: '9px', letterSpacing: '0.4em', color: gold, textTransform: 'uppercase' }}>Equipo</span>
                 </div>
-                {/* título vertical */}
-                <div style={{
-                  writingMode: 'vertical-rl',
-                  transform: 'rotate(180deg)',
-                  fontFamily: "'Playfair Display', serif",
-                  fontSize: '11px', letterSpacing: '0.2em',
-                  color: '#2a2a2a', textTransform: 'uppercase',
-                  marginBottom: '0',
-                }}>
+                <div style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg)', fontFamily: "'Playfair Display', serif", fontSize: '11px', letterSpacing: '0.2em', color: '#2a2a2a', textTransform: 'uppercase', marginBottom: '0' }}>
                   Los Maestros · Blade & Co.
                 </div>
               </div>
@@ -219,16 +199,14 @@ export default function Home() {
               </div>
             </div>
 
-            {/* columna derecha — filas de barberos */}
             <div>
               {barberos.map((b, idx) => {
-                const foto    = b.photoUrl || BARBER_FALLBACK_PHOTOS[idx % BARBER_FALLBACK_PHOTOS.length];
-                const num     = String(idx + 1).padStart(2, '0');
-                const isEven  = idx % 2 === 0;
+                const foto   = b.photoUrl || BARBER_FALLBACK_PHOTOS[idx % BARBER_FALLBACK_PHOTOS.length];
+                const num    = String(idx + 1).padStart(2, '0');
+                const isEven = idx % 2 === 0;
 
                 return (
-                  <div
-                    key={b.id}
+                  <div key={b.id} className="barbero-fila"
                     style={{
                       display: 'grid',
                       gridTemplateColumns: isEven ? '55% 45%' : '45% 55%',
@@ -244,39 +222,17 @@ export default function Home() {
                       e.currentTarget.querySelector('.rline').style.width  = '32px';
                     }}
                   >
-                    {/* FOTO */}
-                    <div style={{
-                      order: isEven ? 0 : 1,
-                      position: 'relative', overflow: 'hidden',
-                    }}>
+                    <div className="barbero-foto" style={{ order: isEven ? 0 : 1, position: 'relative', overflow: 'hidden' }}>
                       <img className="rp" src={foto} alt={b.name}
-                        style={{
-                          width: '100%', height: '100%',
-                          objectFit: 'cover', objectPosition: 'center 15%',
-                          transition: 'transform 0.9s cubic-bezier(.2,.7,.2,1)',
-                          display: 'block',
-                        }}
+                        style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 15%', transition: 'transform 0.9s cubic-bezier(.2,.7,.2,1)', display: 'block' }}
                       />
-                      {/* overlay muy sutil */}
                       <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.18)' }} />
-
-                      {/* número grande flotante */}
-                      <div style={{
-                        position: 'absolute',
-                        top: '20px',
-                        left: isEven ? 'auto' : '20px',
-                        right: isEven ? '20px' : 'auto',
-                        fontFamily: "'Playfair Display', serif",
-                        fontSize: '120px', fontWeight: '700',
-                        color: 'rgba(255,255,255,0.06)',
-                        lineHeight: '1', userSelect: 'none',
-                      }}>
+                      <div style={{ position: 'absolute', top: '20px', left: isEven ? 'auto' : '20px', right: isEven ? '20px' : 'auto', fontFamily: "'Playfair Display', serif", fontSize: '120px', fontWeight: '700', color: 'rgba(255,255,255,0.06)', lineHeight: '1', userSelect: 'none' }}>
                         {num}
                       </div>
                     </div>
 
-                    {/* INFO */}
-                    <div style={{
+                    <div className="barbero-info" style={{
                       order: isEven ? 1 : 0,
                       display: 'flex', flexDirection: 'column', justifyContent: 'center',
                       padding: '52px 56px',
@@ -284,43 +240,16 @@ export default function Home() {
                       borderRight: isEven ? 'none' : '1px solid #111',
                       background: '#050505',
                     }}>
-                      {/* número + specialty */}
                       <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px' }}>
-                        <span style={{ fontFamily: "'Playfair Display', serif", fontSize: '11px', color: gold, letterSpacing: '0.05em' }}>
-                          {num}
-                        </span>
+                        <span style={{ fontFamily: "'Playfair Display', serif", fontSize: '11px', color: gold }}>{num}</span>
                         <div style={{ width: '20px', height: '1px', background: 'rgba(197,160,89,0.4)' }} />
-                        <span style={{ fontFamily: "'Oswald', sans-serif", fontSize: '9px', letterSpacing: '0.35em', color: gold, textTransform: 'uppercase' }}>
-                          {b.specialty}
-                        </span>
+                        <span style={{ fontFamily: "'Oswald', sans-serif", fontSize: '9px', letterSpacing: '0.35em', color: gold, textTransform: 'uppercase' }}>{b.specialty}</span>
                       </div>
-
-                      {/* nombre */}
-                      <h3 style={{
-                        fontFamily: "'Playfair Display', serif",
-                        fontSize: 'clamp(36px, 4vw, 58px)',
-                        fontWeight: '700', color: '#F3F2EE',
-                        lineHeight: '0.95', letterSpacing: '-0.03em',
-                        marginBottom: '28px',
-                      }}>
+                      <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: 'clamp(28px, 4vw, 58px)', fontWeight: '700', color: '#F3F2EE', lineHeight: '0.95', letterSpacing: '-0.03em', marginBottom: '28px' }}>
                         {b.name}
                       </h3>
-
-                      {/* línea animada */}
-                      <div className="rline" style={{
-                        height: '1px', background: gold,
-                        width: '32px', marginBottom: '28px',
-                        transition: 'width 0.6s cubic-bezier(.2,.7,.2,1)',
-                      }} />
-
-                      {/* bio */}
-                      {b.bio && (
-                        <p style={{ color: '#555', fontSize: '13px', lineHeight: '1.85', marginBottom: '32px', maxWidth: '280px' }}>
-                          {b.bio}
-                        </p>
-                      )}
-
-                      {/* horario */}
+                      <div className="rline" style={{ height: '1px', background: gold, width: '32px', marginBottom: '28px', transition: 'width 0.6s cubic-bezier(.2,.7,.2,1)' }} />
+                      {b.bio && <p style={{ color: '#555', fontSize: '13px', lineHeight: '1.85', marginBottom: '32px', maxWidth: '280px' }}>{b.bio}</p>}
                       <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '32px' }}>
                         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={gold} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                           <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
@@ -329,15 +258,7 @@ export default function Home() {
                           {b.workStart} — {b.workEnd}
                         </span>
                       </div>
-
-                      {/* link reservar */}
-                      <Link to="/reservar" style={{
-                        display: 'inline-flex', alignItems: 'center', gap: '10px',
-                        fontFamily: "'Oswald', sans-serif",
-                        fontSize: '10px', letterSpacing: '0.3em', textTransform: 'uppercase',
-                        color: gold, textDecoration: 'none',
-                        transition: 'gap 0.3s ease',
-                      }}
+                      <Link to="/reservar" style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', fontFamily: "'Oswald', sans-serif", fontSize: '10px', letterSpacing: '0.3em', textTransform: 'uppercase', color: gold, textDecoration: 'none', transition: 'gap 0.3s ease' }}
                         onMouseOver={e => e.currentTarget.style.gap = '18px'}
                         onMouseOut={e  => e.currentTarget.style.gap = '10px'}
                       >
@@ -352,17 +273,16 @@ export default function Home() {
               })}
             </div>
           </div>
-
         </section>
       )}
 
       {/* ══ SPLIT FILOSOFÍA ══ */}
       <section style={{ background: '#080808', borderTop: '1px solid #161616' }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '100px 40px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '80px', alignItems: 'center' }}>
+        <div className="filosofia-grid" style={{ maxWidth: '1200px', margin: '0 auto', padding: '100px 24px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '80px', alignItems: 'center' }}>
 
           <div style={{ position: 'relative' }}>
             <img src={TOOLS_IMG} alt="Herramientas premium" style={{ width: '100%', borderRadius: '4px', border: '1px solid #1a1a1a', display: 'block' }} />
-            <div style={{ position: 'absolute', bottom: '-16px', right: '-16px', background: gold, color: '#0A0A0A', padding: '20px 24px', fontFamily: "'Oswald', sans-serif", fontSize: '12px', letterSpacing: '0.12em', textTransform: 'uppercase', fontWeight: '700', lineHeight: '1.5' }}>
+            <div className="filosofia-badge" style={{ position: 'absolute', bottom: '-16px', right: '-16px', background: gold, color: '#0A0A0A', padding: '20px 24px', fontFamily: "'Oswald', sans-serif", fontSize: '12px', letterSpacing: '0.12em', textTransform: 'uppercase', fontWeight: '700', lineHeight: '1.5' }}>
               10+ años<br />de experiencia
             </div>
           </div>
@@ -388,11 +308,11 @@ export default function Home() {
       </section>
 
       {/* ══ CTA FINAL ══ */}
-      <section style={{ position: 'relative', overflow: 'hidden', padding: '140px 40px', textAlign: 'center' }}>
+      <section style={{ position: 'relative', overflow: 'hidden', padding: '140px 24px', textAlign: 'center' }}>
         <img src={HERO_IMG} alt="" aria-hidden="true"
           style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 30%', filter: 'blur(10px) brightness(0.12)' }}
         />
-        <div style={{ position: 'absolute', inset: '40px', border: `1px solid rgba(197,160,89,0.15)`, pointerEvents: 'none' }} />
+        <div className="cta-border" style={{ position: 'absolute', inset: '40px', border: `1px solid rgba(197,160,89,0.15)`, pointerEvents: 'none' }} />
 
         <div style={{ position: 'relative', zIndex: 10, maxWidth: '580px', margin: '0 auto' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '16px', marginBottom: '24px' }}>

@@ -124,3 +124,85 @@ html, body, #root {
 .slot.selected { background: var(--gold); color: #0A0A0A; font-weight: 700; border-color: var(--gold); }
 
 a { color: inherit; text-decoration: none; }
+/* ── RESPONSIVE MOBILE ── */
+@media (max-width: 768px) {
+
+  /* Oculta barra superior */
+  header > div:first-child { display: none !important; }
+
+  /* Navbar padding */
+  nav.glass { padding: 0 16px !important; }
+
+  /* Hero */
+  .hero-content { padding: 90px 20px 70px !important; }
+
+  /* Oculta línea vertical decorativa del hero */
+  .hero-content ~ div[style*="left: 60px"] { display: none !important; }
+
+  /* Métricas hero: 2 columnas */
+  .hero-metricas {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+  }
+  .hero-metricas > div {
+    border-right: 1px solid rgba(197,160,89,0.25) !important;
+    border-bottom: 1px solid rgba(197,160,89,0.25) !important;
+  }
+
+  /* Bento grid: 1 columna */
+  .bento-grid {
+    grid-template-columns: 1fr !important;
+    grid-template-rows: repeat(5, 200px) !important;
+  }
+  .bento-grid > div {
+    grid-column: 1 !important;
+    grid-row: auto !important;
+  }
+
+  /* Servicios home: 1 columna */
+  .servicios-home-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .servicios-home-grid > div {
+    border-right: none !important;
+    border-bottom: 1px solid #1a1a1a !important;
+    padding: 28px 20px !important;
+  }
+
+  /* Barberos: oculta columna lateral */
+  .barberos-layout {
+    grid-template-columns: 1fr !important;
+  }
+  .barberos-layout > div:first-child { display: none !important; }
+  .barbero-fila {
+    grid-template-columns: 1fr !important;
+    height: auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+  .barbero-foto { height: 260px !important; order: 0 !important; }
+  .barbero-info {
+    order: 1 !important;
+    padding: 28px 20px !important;
+    border-left: none !important;
+    border-right: none !important;
+    border-top: 1px solid #111 !important;
+  }
+
+  /* Filosofía: 1 columna */
+  .filosofia-grid {
+    grid-template-columns: 1fr !important;
+    gap: 32px !important;
+  }
+  .filosofia-badge { display: none !important; }
+
+  /* Servicios página */
+  .servicios-cards {
+    grid-template-columns: 1fr !important;
+  }
+  .servicios-card { padding: 24px 20px !important; }
+
+  /* CTA padding */
+  section[style*="padding: 140px"] { padding: 80px 20px !important; }
+  .cta-border { display: none !important; }
+}
