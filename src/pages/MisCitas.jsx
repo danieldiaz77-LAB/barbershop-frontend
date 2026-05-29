@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { appointmentsApi } from '../services/endpoints';
 
-// colores según estado de la cita
 const estadoColor = {
   PENDING:   { color: '#fbbf24', bg: 'rgba(251,191,36,0.08)',   label: 'Pendiente' },
   PAID:      { color: '#4ade80', bg: 'rgba(74,222,128,0.08)',   label: 'Pagada' },
@@ -33,7 +32,6 @@ export default function MisCitas() {
     } finally { setCancelando(null); }
   };
 
-
   const formatFecha = (dt) => new Date(dt).toLocaleDateString('es-CL', {
     weekday: 'short', day: 'numeric', month: 'long', year: 'numeric',
   });
@@ -43,7 +41,14 @@ export default function MisCitas() {
   });
 
   return (
-    <div style={{ maxWidth: '900px', margin: '0 auto', padding: '60px 40px' }}>
+    <div style={{ maxWidth: '900px', margin: '0 auto', padding: '60px 20px' }}>
+
+      <style>{`
+        @media (max-width: 768px) {
+          .cita-header { flex-direction: column !important; align-items: flex-start !important; }
+          .cita-precio { text-align: left !important; }
+        }
+      `}</style>
 
       {/* encabezado */}
       <div className="fadeup" style={{ marginBottom: '48px' }}>
@@ -57,7 +62,7 @@ export default function MisCitas() {
         </div>
         <h1 style={{
           fontFamily: "'Playfair Display', serif",
-          fontSize: '48px', fontWeight: '700',
+          fontSize: 'clamp(36px, 6vw, 48px)', fontWeight: '700',
           letterSpacing: '-0.02em',
         }}>
           Mis Citas
@@ -81,9 +86,8 @@ export default function MisCitas() {
           Cargando citas...
         </div>
       ) : citas.length === 0 ? (
-        /* sin citas */
         <div style={{
-          textAlign: 'center', padding: '80px 40px',
+          textAlign: 'center', padding: '60px 20px',
           border: '1px solid #1a1a1a', borderRadius: '4px',
         }}>
           <div style={{ fontSize: '48px', marginBottom: '16px' }}>✂️</div>
@@ -107,32 +111,29 @@ export default function MisCitas() {
             return (
               <div key={c.id} className="card fadeup" style={{ padding: '0', overflow: 'hidden' }}>
 
-                {/* barra de color según estado */}
                 <div style={{ height: '3px', background: estado.color }} />
 
-                <div style={{ padding: '24px 28px' }}>
-                  <div style={{
+                <div style={{ padding: '20px' }}>
+                  <div className="cita-header" style={{
                     display: 'flex', justifyContent: 'space-between',
                     alignItems: 'flex-start', flexWrap: 'wrap', gap: '12px',
                   }}>
 
-                    {/* info principal */}
-                    <div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
                       <h3 style={{
                         fontFamily: "'Playfair Display', serif",
-                        fontSize: '22px', marginBottom: '6px',
+                        fontSize: '20px', marginBottom: '6px',
                       }}>
                         {c.serviceName}
                       </h3>
-                      <div style={{ color: '#666', fontSize: '13px', lineHeight: '1.8' }}>
-                        ✂️ {c.barberName} &nbsp;·&nbsp;
-                        📅 {formatFecha(c.startTime)} &nbsp;·&nbsp;
+                      <div style={{ color: '#666', fontSize: '13px', lineHeight: '2' }}>
+                        ✂️ {c.barberName}<br />
+                        📅 {formatFecha(c.startTime)}<br />
                         🕐 {formatHora(c.startTime)} — {formatHora(c.endTime)}
                       </div>
                     </div>
 
-                    {/* precio y estado */}
-                    <div style={{ textAlign: 'right' }}>
+                    <div className="cita-precio" style={{ textAlign: 'right' }}>
                       <div style={{
                         fontFamily: "'Playfair Display', serif",
                         fontSize: '24px', fontWeight: '700',
@@ -156,15 +157,12 @@ export default function MisCitas() {
                     </div>
                   </div>
 
-                  {/* acciones */}
                   {(c.status === 'PENDING' || c.status === 'PAID') && (
                     <div style={{
                       display: 'flex', gap: '10px',
-                      marginTop: '20px',
-                      paddingTop: '20px',
+                      marginTop: '20px', paddingTop: '20px',
                       borderTop: '1px solid #111',
                     }}>
-
                       <button
                         onClick={() => cancelar(c.id)}
                         disabled={cancelando === c.id}
@@ -184,9 +182,7 @@ export default function MisCitas() {
 
       {citas.length > 0 && (
         <div style={{ marginTop: '40px', textAlign: 'center' }}>
-          <Link to="/reservar" className="btn-ghost">
-            + Nueva reserva
-          </Link>
+          <Link to="/reservar" className="btn-ghost">+ Nueva reserva</Link>
         </div>
       )}
     </div>
