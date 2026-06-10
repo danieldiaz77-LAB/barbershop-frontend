@@ -4,14 +4,15 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import ProtectedRoute from './components/ProtectedRoute';
 
-// páginas
-import Home from './pages/Home';
-import Login from './pages/Login';
-import Register from './pages/Register';
-import Servicios from './pages/Servicios';
-import Reservar from './pages/Reservar';
-import MisCitas from './pages/MisCitas';
-import AdminDashboard from './pages/AdminDashboard';
+import Home            from './pages/Home';
+import Login           from './pages/Login';
+import Register        from './pages/Register';
+import VerificarEmail  from './pages/VerificarEmail';
+import Servicios       from './pages/Servicios';
+import Reservar        from './pages/Reservar';
+import MisCitas        from './pages/MisCitas';
+import AdminDashboard  from './pages/AdminDashboard';
+import BarberDashboard from './pages/BarberDashboard';
 
 export default function App() {
   return (
@@ -25,12 +26,22 @@ export default function App() {
             <Route path="/register"  element={<Register />} />
             <Route path="/servicios" element={<Servicios />} />
 
-            {/* rutas protegidas — requieren login */}
+            {/* verificacion de email */}
+            <Route path="/verificar-email" element={<VerificarEmail />} />
+
+            {/* rutas protegidas */}
             <Route path="/reservar" element={
               <ProtectedRoute><Reservar /></ProtectedRoute>
             } />
             <Route path="/mis-citas" element={
               <ProtectedRoute><MisCitas /></ProtectedRoute>
+            } />
+
+            {/* solo BARBER */}
+            <Route path="/barber" element={
+              <ProtectedRoute requireRole="BARBER">
+                <BarberDashboard />
+              </ProtectedRoute>
             } />
 
             {/* solo BARBER_ADMIN */}

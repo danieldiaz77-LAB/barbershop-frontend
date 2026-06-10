@@ -2,9 +2,12 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
+const neon = '#BDFF00';
+
 export default function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -12,126 +15,174 @@ export default function Login() {
 
   const onSubmit = async (e) => {
     e.preventDefault();
-    setError(''); setLoading(true);
+    setError('');
+    setLoading(true);
+
     try {
       const data = await login(email, password);
-      navigate(data.role === 'BARBER_ADMIN' ? '/admin' : '/');
+
+      navigate(
+        data.role === 'BARBER_ADMIN' ? '/admin' :
+        data.role === 'BARBER' ? '/barber' : '/'
+      );
     } catch {
-      setError('Email o contraseña incorrectos');
-    } finally { setLoading(false); }
+      setError('Email o contrasena incorrectos');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div style={{
-      minHeight: '80vh', display: 'flex',
-      alignItems: 'center', justifyContent: 'center',
-      padding: '40px 20px',
-    }}>
-      <div className="fadeup" style={{ width: '100%', maxWidth: '420px' }}>
+    <main className="login-page">
+      <style>{`
+        .login-page {
+          min-height: 100vh;
+          padding: 190px 20px 96px;
+          background:
+            radial-gradient(circle at 75% 18%, rgba(189,255,0,.10), transparent 30%),
+            #0A0A0A;
+          display: flex;
+          justify-content: center;
+          align-items: flex-start;
+        }
 
-        {/* encabezado */}
-        <div style={{ marginBottom: '40px' }}>
-          <div style={{
-            fontFamily: "'Oswald', sans-serif",
-            fontSize: '11px', letterSpacing: '0.3em',
-            color: '#C5A059', textTransform: 'uppercase',
-            marginBottom: '12px',
-          }}>
-            Bienvenido de vuelta
-          </div>
-          <h1 style={{
-            fontFamily: "'Playfair Display', serif",
-            fontSize: '40px', fontWeight: '700',
-            letterSpacing: '-0.02em',
-          }}>
-            Iniciar sesión
+        .login-box {
+          width: 100%;
+          max-width: 430px;
+        }
+
+        .login-head {
+          margin-bottom: 38px;
+        }
+
+        .login-kicker {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 10px;
+          margin-bottom: 14px;
+          color: ${neon};
+          font-size: 11px;
+          font-weight: 900;
+          letter-spacing: .35em;
+          text-transform: uppercase;
+        }
+
+        .login-kicker::before,
+        .login-kicker::after {
+          content: "";
+          width: 34px;
+          height: 2px;
+          background: ${neon};
+          box-shadow: 0 0 8px ${neon};
+        }
+
+        .login-title {
+          color: #fff;
+          text-align: center;
+          font-size: clamp(54px, 8vw, 76px);
+          line-height: .9;
+        }
+
+        .login-form {
+          display: flex;
+          flex-direction: column;
+          gap: 18px;
+        }
+
+        .login-label {
+          display: block;
+          margin-bottom: 8px;
+          color: #62685d;
+          font-size: 10px;
+          font-weight: 900;
+          letter-spacing: .25em;
+          text-transform: uppercase;
+        }
+
+        .login-error {
+          padding: 12px 16px;
+          border: 1px solid rgba(248,113,113,.25);
+          background: rgba(248,113,113,.08);
+          color: #f87171;
+          font-size: 13px;
+        }
+
+        .login-register {
+          margin-top: 28px;
+          text-align: center;
+          color: #5f665a;
+          font-size: 14px;
+        }
+
+        .login-register a {
+          color: ${neon};
+          font-weight: 800;
+        }
+
+        @media (max-width: 768px) {
+          .login-page {
+            padding-top: 150px;
+            padding-bottom: 72px;
+          }
+        }
+      `}</style>
+
+      <section className="login-box fadeup">
+        <header className="login-head">
+          <div className="login-kicker">Bienvenido de vuelta</div>
+
+          <h1 className="flow-title login-title">
+            INICIAR SESION
           </h1>
-        </div>
+        </header>
 
-        <form onSubmit={onSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <form onSubmit={onSubmit} className="login-form">
           <div>
-            <label style={{
-              fontFamily: "'Oswald', sans-serif",
-              fontSize: '11px', letterSpacing: '0.2em',
-              color: '#666', textTransform: 'uppercase',
-              display: 'block', marginBottom: '8px',
-            }}>
-              Email
-            </label>
+            <label className="login-label">Email</label>
             <input
-              type="email" required
+              type="email"
+              required
               value={email}
-              onChange={e => setEmail(e.target.value)}
+              onChange={(e) => setEmail(e.target.value)}
               placeholder="tu@email.com"
               className="input-dark"
             />
           </div>
 
           <div>
-            <label style={{
-              fontFamily: "'Oswald', sans-serif",
-              fontSize: '11px', letterSpacing: '0.2em',
-              color: '#666', textTransform: 'uppercase',
-              display: 'block', marginBottom: '8px',
-            }}>
-              Contraseña
-            </label>
+            <label className="login-label">Contrasena</label>
             <input
-              type="password" required
+              type="password"
+              required
               value={password}
-              onChange={e => setPassword(e.target.value)}
-              placeholder="••••••••"
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="********"
               className="input-dark"
             />
           </div>
 
           {error && (
-            <div style={{
-              background: 'rgba(153,27,27,0.2)',
-              border: '1px solid rgba(248,113,113,0.3)',
-              color: '#f87171', padding: '12px 16px',
-              borderRadius: '2px', fontSize: '13px',
-            }}>
+            <div className="login-error">
               {error}
             </div>
           )}
 
           <button
-            type="submit" disabled={loading}
-            className="btn-gold"
-            style={{ width: '100%', justifyContent: 'center', marginTop: '8px' }}
+            type="submit"
+            disabled={loading}
+            className="btn-neon"
+            style={{ width: '100%', justifyContent: 'center', marginTop: 8 }}
           >
-            {loading ? 'Ingresando...' : 'Ingresar →'}
+            {loading ? 'Ingresando...' : 'Ingresar ->'}
           </button>
         </form>
 
-        <div style={{ marginTop: '24px', textAlign: 'center', color: '#555', fontSize: '13px' }}>
-          ¿No tienes cuenta?{' '}
-          <Link to="/register" style={{ color: '#C5A059' }}>Regístrate</Link>
+        <div className="login-register">
+          No tienes cuenta?{' '}
+          <Link to="/register">Registrate</Link>
         </div>
-
-        {/* credenciales demo */}
-        <div style={{
-          marginTop: '40px',
-          border: '1px solid #1a1a1a',
-          borderRadius: '4px',
-          padding: '16px',
-        }}>
-          <div style={{
-            fontFamily: "'Oswald', sans-serif",
-            fontSize: '10px', letterSpacing: '0.2em',
-            color: '#C5A059', textTransform: 'uppercase',
-            marginBottom: '10px',
-          }}>
-            Cuentas de prueba
-          </div>
-          <div style={{ fontSize: '12px', color: '#555', lineHeight: '2' }}>
-            👤 Cliente: client@barbershop.com / Client123!<br />
-            🔧 Admin: admin@barbershop.com / Admin123!
-          </div>
-        </div>
-
-      </div>
-    </div>
+      </section>
+    </main>
   );
 }

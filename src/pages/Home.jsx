@@ -1,339 +1,711 @@
 import { Link } from 'react-router-dom';
-import { useEffect, useState } from 'react';
-import { barbersApi } from '../services/endpoints';
+import { useEffect, useMemo, useState } from 'react';
+import heroDesktop from '../assets/hero-desktop.png';
+import heroMobile from '../assets/hero-mobile.png';
+import { barbersApi, servicesApi } from '../services/endpoints';
+import t1 from '../assets/trabajo1.jpg';
+import t2 from '../assets/trabajo2.jpg';
+import t3 from '../assets/trabajo3.jpg';
+import t4 from '../assets/trabajo4.jpg';
+import t5 from '../assets/trabajo5.jpg';
 
-const NOMBRE = 'BLADE & CO.';
+const MARCA = 'ELPIPEBARBER';
+const SELLO = 'FLOW FUTURAMA';
+const INSTAGRAM = 'https://www.instagram.com/elpipebarber?igsh=MXN5eWF6bzZvZnoy';
 
-const HERO_IMG      = 'https://images.unsplash.com/photo-1599351431202-1e0f0137899a?crop=entropy&cs=srgb&fm=jpg&q=90&w=1920';
-const BARBER_WORKING = 'https://images.unsplash.com/photo-1503951914875-452162b0f3f1?crop=entropy&cs=srgb&fm=jpg&q=85&w=900';
-const TOOLS_IMG     = 'https://images.unsplash.com/photo-1621605815971-fbc98d665033?crop=entropy&cs=srgb&fm=jpg&q=85&w=900';
-const INTERIOR_IMG  = 'https://images.unsplash.com/photo-1585747860715-2ba37e788b70?crop=entropy&cs=srgb&fm=jpg&q=85&w=900';
+const neon = '#b7ff00';
 
-const BARBER_FALLBACK_PHOTOS = [
-  'https://dbarbers.cl/wp-content/uploads/2025/11/AAF05397-683x1024.jpg',
-  'https://tse3.mm.bing.net/th/id/OIP.DXJL3MCQ8Lq3YHVMnuonIQHaHc?cb=thfvnextfalcon&rs=1&pid=ImgDetMain&o=7&rm=3',
+const fallbackServices = [
+  {
+    id: 'fallback-corte',
+    name: 'Corte',
+    description: 'Corte tradicional, degradado bajo, medio, alto, mohicano o estilo general.',
+    price: 12000,
+    durationMinutes: 30,
+  },
+  {
+    id: 'fallback-barba',
+    name: 'Barba',
+    description: 'Perfilado, rebaje y terminaciones de barba.',
+    price: 5000,
+    durationMinutes: 20,
+  },
+  {
+    id: 'fallback-combo',
+    name: 'Corte + barba',
+    description: 'El combo completo: corte y perfilado de barba.',
+    price: 15000,
+    durationMinutes: 60,
+  },
 ];
 
-const gold = '#C5A059';
+const trabajos = [
+  { src: t1, pos: 'center 53%' },
+  { src: t2, pos: 'left 45%' },
+  { src: t3, pos: 'center 28%' },
+  { src: t5, pos: 'center 45%' },
+  { src: t4, pos: 'center 28%' },
+];
+const ScissorsIcon = () => (
+  <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="6" cy="6" r="3" />
+    <circle cx="6" cy="18" r="3" />
+    <path d="M20 4 8.12 15.88M14.47 14.48 20 20M8.12 8.12 12 12" />
+  </svg>
+);
+
+const RazorIcon = () => (
+  <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M3 21h18" />
+    <path d="M5 17h12l4-7H10z" />
+    <path d="M10 10 8 4h7l2 6" />
+  </svg>
+);
+
+const BeardIcon = () => (
+  <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M8 10V8a4 4 0 0 1 8 0v2" />
+    <path d="M6 11c0 6 3 10 6 10s6-4 6-10" />
+    <path d="M9 14c1.8 1 4.2 1 6 0" />
+    <path d="M9 18c2 1.2 4 1.2 6 0" />
+  </svg>
+);
+
+const BoltIcon = () => (
+  <svg width="34" height="34" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M13 2 4 14h7l-1 8 10-13h-7z" />
+  </svg>
+);
+
+const CalendarIcon = () => (
+  <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z" />
+  </svg>
+);
+
+const InstagramIcon = () => (
+  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="2" y="2" width="20" height="20" rx="5" />
+    <circle cx="12" cy="12" r="4" />
+    <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" />
+  </svg>
+);
+
+function formatPrice(value) {
+  const number = Number(value || 0);
+  return `$${number.toLocaleString('es-CL')}`;
+}
+
+function serviceIcon(index) {
+  const icons = [<ScissorsIcon />, <RazorIcon />, <BeardIcon />, <BoltIcon />];
+  return icons[index % icons.length];
+}
 
 export default function Home() {
   const [barberos, setBarberos] = useState([]);
+  const [servicios, setServicios] = useState([]);
 
   useEffect(() => {
     barbersApi.list().then(setBarberos).catch(() => {});
+    servicesApi.list().then((data) => setServicios(data.slice(0, 4))).catch(() => {});
   }, []);
 
+  const serviciosHome = useMemo(() => {
+    return servicios.length ? servicios : fallbackServices;
+  }, [servicios]);
+
+  const barberoPrincipal = barberos[0];
+
   return (
-    <div style={{ overflowX: 'hidden' }}>
+    <div style={{ overflow: 'hidden', background: '#030403' }}>
+      <style>{`
+        .pipe-hero-grid {
+        min-height: 100vh;
+        display: grid;
+        align-items: start;
+        padding: 168px 0 28px;
+      }
 
-      {/* ══ HERO ══ */}
-      <section style={{ position: 'relative', minHeight: '100vh', overflow: 'hidden' }}>
-        <img src={HERO_IMG} alt="Barbería premium"
-          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 30%' }}
+      .pipe-hero-img {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center center;
+        opacity: 1;
+        z-index: -3;
+      }
+
+        .pipe-hero-title {
+          font-size: clamp(52px, 6.8vw, 98px);
+          max-width: 860px;
+        }
+
+        .pipe-feature-row {
+          display: grid;
+          grid-template-columns: repeat(3, auto);
+          justify-content: flex-start;
+          gap: 18px;
+        }
+
+        .pipe-services-grid {
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+          gap: 22px;
+        }
+
+        .pipe-work-grid {
+          display: grid;
+          grid-template-columns: 1.15fr 1fr 1fr 1fr 1fr;
+          gap: 18px;
+        }
+
+        .pipe-work-grid a:first-child {
+          grid-column: span 1;
+        }
+
+        .pipe-testimonials {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 22px;
+        }
+
+        @media (max-width: 680px) {
+        .pipe-hero-grid {
+          min-height: 100vh;
+          padding: 132px 0 34px;
+        }
+
+        .pipe-hero-img {
+          object-position: center top;
+        }
+
+        .pipe-hero-title {
+          font-size: clamp(50px, 17vw, 78px);
+        }
+
+        .pipe-feature-row,
+        .pipe-services-grid,
+        .pipe-testimonials {
+          grid-template-columns: 1fr;
+        }
+
+        .pipe-work-grid {
+          display: flex;
+          overflow-x: auto;
+          padding-bottom: 8px;
+          scroll-snap-type: x mandatory;
+        }
+
+        .pipe-work-grid a {
+          min-width: 72%;
+          scroll-snap-align: start;
+        }
+      }
+      `}</style>
+
+      <section style={{ position: 'relative', isolation: 'isolate' }}>
+        <picture>
+        <source media="(max-width: 680px)" srcSet={heroMobile} />
+        <img
+          src={heroDesktop}
+          alt="Elpipebarber Flow Futurama"
+          className="pipe-hero-img"
         />
+      </picture>
+
         <div style={{
-          position: 'absolute', inset: 0,
-          background: 'linear-gradient(100deg, rgba(0,0,0,0.93) 42%, rgba(0,0,0,0.25) 100%)',
-        }} />
-        <div style={{
-          position: 'absolute', bottom: 0, left: 0, right: 0, height: '200px',
-          background: 'linear-gradient(to top, #0A0A0A, transparent)',
+          position: 'absolute',
+          inset: 0,
+          zIndex: -2,
+          background: `
+          linear-gradient(90deg, rgba(3,4,3,.90) 0%, rgba(3,4,3,.58) 34%, rgba(3,4,3,.10) 72%, rgba(3,4,3,.68) 100%),
+          linear-gradient(0deg, #030403 0%, rgba(3,4,3,.06) 42%, rgba(3,4,3,.30) 100%)
+        `,
         }} />
 
-        <div className="hero-linea-vertical" style={{
-          position: 'absolute', left: '60px', top: '15%', height: '70%',
-          width: '1px',
-          background: `linear-gradient(to bottom, transparent, ${gold} 30%, ${gold} 70%, transparent)`,
-        }} />
+        <div className="flow-scratch" style={{ width: 220, height: 6, right: '4%', top: '28%', opacity: 0.35 }} />
+        <div className="flow-scratch" style={{ width: 430, height: 10, right: '12%', bottom: '24%', opacity: 0.55 }} />
+        <div className="flow-scratch" style={{ width: 220, height: 6, left: '6%', bottom: '15%', opacity: 0.45 }} />
 
-        <div className="hero-content fadeup" style={{
-          position: 'relative', zIndex: 10,
-          maxWidth: '1200px', margin: '0 auto',
-          padding: '160px 100px 120px',
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '28px' }}>
-            <div style={{ width: '40px', height: '1px', background: gold }} />
-            <span style={{ fontFamily: "'Oswald', sans-serif", fontSize: '11px', letterSpacing: '0.4em', color: gold, textTransform: 'uppercase' }}>
-              Barbería Premium · Est. 2024
-            </span>
+        <div className="flow-shell pipe-hero-grid" style={{ marginLeft: 'clamp(24px, 5.5vw, 120px)', marginRight: 'auto' }}>
+          <div className="hero-content fadeup">
+            <div className="flow-kicker" style={{ marginBottom: 18 }}>
+              Mas que un corte, una experiencia
+            </div>
+
+            <h1 className="flow-title pipe-hero-title" style={{ margin: 0, color: '#fff' }}>
+              TU CORTE.
+              <br />
+              <span style={{ color: neon, textShadow: '0 0 28px rgba(183,255,0,.25)' }}>
+                TU FLOW FUTURAMA.
+              </span>
+            </h1>
+
+            <p style={{
+              maxWidth: 640,
+              margin: '18px 0 0',
+              color: '#e4e8dc',
+              fontSize: 16,
+              lineHeight: 1.65,
+            }}>
+              Fades limpios, disenos personalizados, barba y estilo urbano de la mano de Felipe,
+              barbero profesional en Stgo/Maipu.
+            </p>
+
+            <div className="pipe-feature-row hero-metricas" style={{ marginTop: 24 }}>
+              {[
+                ['Barbero profesional', <ScissorsIcon />],
+                ['Flow Futurama', <BoltIcon />],
+                ['Stgo / Maipu', <BeardIcon />],
+              ].map(([label, icon]) => (
+                <div key={label} style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 12,
+                  minHeight: 64,
+                  padding: '12px 14px',
+                  border: '1px solid rgba(183,255,0,.2)',
+                  borderRadius: 8,
+                  background: 'rgba(0,0,0,.34)',
+                  color: neon,
+                }}>
+                  <span style={{ display: 'grid', placeItems: 'center' }}>{icon}</span>
+                  <span style={{
+                    maxWidth: 120,
+                    color: '#f5f7ef',
+                    fontSize: 12,
+                    fontWeight: 900,
+                    letterSpacing: '.08em',
+                    lineHeight: 1.25,
+                    textTransform: 'uppercase',
+                  }}>
+                    {label}
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', marginTop: 26 }}>
+              <Link to="/reservar" className="btn-neon" style={{ minWidth: 280 }}>
+                <CalendarIcon />
+                Reserva tu hora
+                <span style={{ fontSize: 30, lineHeight: 1 }}>→</span>
+              </Link>
+              <a href={INSTAGRAM} target="_blank" rel="noreferrer" className="btn-ghost">
+                <InstagramIcon />
+                Ver trabajos
+              </a>
+            </div>
+
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 18,
+              marginTop: 34,
+              color: '#f5f7ef',
+            }}>
+              <div style={{ display: 'flex' }}>
+                {[0, 1, 2, 3].map((n) => (
+                  <div key={n} style={{
+                    width: 38,
+                    height: 38,
+                    marginLeft: n ? -10 : 0,
+                    border: '2px solid #030403',
+                    borderRadius: '50%',
+                    background: `linear-gradient(135deg, #1d2118, ${neon})`,
+                    display: 'grid',
+                    placeItems: 'center',
+                    color: '#030403',
+                    fontWeight: 900,
+                    fontSize: 12,
+                  }}>
+                    EP
+                  </div>
+                ))}
+                <div style={{
+                  width: 38,
+                  height: 38,
+                  marginLeft: -10,
+                  border: '2px solid #030403',
+                  borderRadius: '50%',
+                  background: '#0a0d08',
+                  display: 'grid',
+                  placeItems: 'center',
+                  color: neon,
+                  fontSize: 12,
+                  fontWeight: 900,
+                }}>
+                  +28k
+                </div>
+              </div>
+
+              <div style={{ fontSize: 12, fontWeight: 900, letterSpacing: '.08em', textTransform: 'uppercase' }}>
+                <span style={{ color: '#fff' }}>28.3 mil seguidores</span>
+                <br />
+                <span style={{ color: neon }}>siguen el flow</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="servicios" style={{ padding: '54px 0 28px' }}>
+        <div className="flow-shell">
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'end',
+            gap: 18,
+            marginBottom: 22,
+          }}>
+            <div>
+              <div className="flow-kicker">Nuestros servicios</div>
+              <h2 className="flow-title" style={{ marginTop: 8, fontSize: 'clamp(38px, 5vw, 68px)' }}>
+                PRECIOS Y CORTES
+              </h2>
+            </div>
+
+            <Link to="/servicios" style={{
+              color: '#fff',
+              fontSize: 13,
+              fontWeight: 900,
+              letterSpacing: '.08em',
+              textTransform: 'uppercase',
+            }}>
+              Ver todos <span style={{ color: neon }}>›</span>
+            </Link>
           </div>
 
-          <h1 style={{ fontFamily: "'Playfair Display', serif", fontSize: 'clamp(52px, 9vw, 120px)', fontWeight: '700', lineHeight: '0.92', letterSpacing: '-0.03em', color: '#F3F2EE', maxWidth: '650px', marginBottom: '0' }}>
-            El arte
-          </h1>
-          <h1 style={{ fontFamily: "'Playfair Display', serif", fontSize: 'clamp(52px, 9vw, 120px)', fontWeight: '700', lineHeight: '0.92', letterSpacing: '-0.03em', color: gold, fontStyle: 'italic', maxWidth: '650px', marginBottom: '36px' }}>
-            del corte.
-          </h1>
-
-          <p style={{ color: '#888', fontSize: '16px', lineHeight: '1.9', maxWidth: '380px', marginBottom: '52px', borderLeft: `2px solid ${gold}`, paddingLeft: '20px' }}>
-            Maestros barberos, rituales clásicos y estilo moderno.
-            Reserva tu hora en minutos y vive la experiencia.
-          </p>
-
-          <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', marginBottom: '60px' }}>
-            <Link to="/reservar" className="btn-gold" style={{ padding: '16px 40px', fontSize: '13px' }}>
-              Reservar ahora →
-            </Link>
-            <Link to="/servicios" className="btn-ghost" style={{ padding: '16px 40px', fontSize: '13px' }}>
-              Ver servicios
-            </Link>
-          </div>
-
-          {/* métricas */}
-          <div className="hero-metricas" style={{ display: 'flex', gap: '0' }}>
-            {[
-              ['10+', 'Años de oficio'],
-              ['3',   'Maestros'],
-              ['★ 5', 'Google'],
-              ['500+','Clientes'],
-            ].map(([n, l], i) => (
-              <div key={l} style={{
-                padding: '20px 32px',
-                border: `1px solid rgba(197,160,89,0.25)`,
-                borderRight: i < 3 ? 'none' : `1px solid rgba(197,160,89,0.25)`,
-                background: 'rgba(0,0,0,0.45)',
+          <div className="pipe-services-grid servicios-home-grid">
+            {serviciosHome.map((servicio, index) => (
+              <article key={servicio.id} className="card fadeup" style={{
+                minHeight: 236,
+                padding: 26,
+                animationDelay: `${index * 0.05}s`,
               }}>
-                <div style={{ fontFamily: "'Playfair Display', serif", fontSize: '32px', color: gold, fontWeight: '700', lineHeight: '1' }}>{n}</div>
-                <div style={{ fontFamily: "'Oswald', sans-serif", fontSize: '10px', color: '#444', letterSpacing: '0.2em', textTransform: 'uppercase', marginTop: '6px' }}>{l}</div>
-              </div>
+                <div style={{ color: neon, marginBottom: 24 }}>
+                  {serviceIcon(index)}
+                </div>
+
+                <h3 style={{
+                  minHeight: 48,
+                  color: '#fff',
+                  fontSize: 20,
+                  lineHeight: 1.2,
+                  fontWeight: 900,
+                  textTransform: 'uppercase',
+                  marginBottom: 12,
+                }}>
+                  {servicio.name}
+                </h3>
+
+                <p style={{
+                  minHeight: 58,
+                  color: 'var(--muted)',
+                  fontSize: 14,
+                  lineHeight: 1.65,
+                  marginBottom: 18,
+                }}>
+                  {servicio.description || 'Servicio profesional con sello Flow Futurama.'}
+                </p>
+
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'baseline',
+                  justifyContent: 'space-between',
+                  gap: 12,
+                  borderTop: '1px solid rgba(183,255,0,.14)',
+                  paddingTop: 16,
+                }}>
+                  <strong style={{ color: neon, fontSize: 22, fontWeight: 900 }}>
+                    {index === 3 && !servicios.length ? 'Desde ' : ''}
+                    {formatPrice(servicio.price)}
+                  </strong>
+                  <span style={{ color: '#777d70', fontSize: 12, fontWeight: 800 }}>
+                    {servicio.durationMinutes} min
+                  </span>
+                </div>
+              </article>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ══ BENTO GRID ══ */}
-      <section style={{ maxWidth: '1200px', margin: '0 auto', padding: '80px 24px' }}>
-        <div className="bento-grid" style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.8fr 1fr', gridTemplateRows: '280px 280px', gap: '10px' }}>
-
-          <div style={{ gridColumn: '1/2', gridRow: '1/3', position: 'relative', overflow: 'hidden', borderRadius: '4px' }}>
-            <img src={INTERIOR_IMG} alt="Interior"
-              style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.7s ease' }}
-              onMouseOver={e => e.currentTarget.style.transform = 'scale(1.05)'}
-              onMouseOut={e  => e.currentTarget.style.transform = 'scale(1)'}
-            />
-            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.75) 35%, transparent)' }} />
-            <div style={{ position: 'absolute', bottom: '28px', left: '28px' }}>
-              <div style={{ fontFamily: "'Oswald', sans-serif", fontSize: '10px', color: gold, letterSpacing: '0.3em', textTransform: 'uppercase', marginBottom: '8px' }}>Ambiente</div>
-              <div style={{ fontFamily: "'Playfair Display', serif", fontSize: '26px', fontWeight: '700' }}>Espacio único</div>
-            </div>
-          </div>
-
-          <div style={{ gridColumn: '2/3', gridRow: '1/2', background: gold, borderRadius: '4px', display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '36px' }}>
-            <div style={{ fontFamily: "'Oswald', sans-serif", fontSize: '10px', letterSpacing: '0.3em', color: '#0A0A0A', textTransform: 'uppercase', marginBottom: '10px' }}>Nuestra promesa</div>
-            <div style={{ fontFamily: "'Playfair Display', serif", fontSize: '26px', fontWeight: '700', color: '#0A0A0A', lineHeight: '1.2' }}>Cada corte,<br />una obra de arte.</div>
-          </div>
-
-          <div style={{ gridColumn: '3/4', gridRow: '1/2', position: 'relative', overflow: 'hidden', borderRadius: '4px' }}>
-            <img src={BARBER_WORKING} alt="Barbero trabajando" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top' }} />
-            <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.2)' }} />
-          </div>
-
-          <div style={{ gridColumn: '2/3', gridRow: '2/3', position: 'relative', overflow: 'hidden', borderRadius: '4px' }}>
-            <img src={TOOLS_IMG} alt="Herramientas" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-            <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.15)' }} />
-          </div>
-
-          <div style={{ gridColumn: '3/4', gridRow: '2/3', background: '#111', borderRadius: '4px', border: '1px solid #1a1a1a', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
-            <div style={{ fontFamily: "'Playfair Display', serif", fontSize: '80px', fontWeight: '700', color: gold, lineHeight: '1' }}>500+</div>
-            <div style={{ fontFamily: "'Oswald', sans-serif", fontSize: '11px', letterSpacing: '0.3em', color: '#444', textTransform: 'uppercase', marginTop: '8px' }}>Clientes felices</div>
-          </div>
-        </div>
-      </section>
-
-      {/* ══ SERVICIOS ══ */}
-      <section style={{ background: '#080808', borderTop: '1px solid #161616', borderBottom: '1px solid #161616', padding: '100px 0' }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 24px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '56px', flexWrap: 'wrap', gap: '20px' }}>
+      <section id="trabajos" style={{ padding: '44px 0 34px' }}>
+        <div className="flow-shell">
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            gap: 18,
+            marginBottom: 18,
+          }}>
             <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '14px' }}>
-                <div style={{ width: '36px', height: '1px', background: gold }} />
-                <span style={{ fontFamily: "'Oswald', sans-serif", fontSize: '11px', letterSpacing: '0.35em', color: gold, textTransform: 'uppercase' }}>Lo que ofrecemos</span>
-              </div>
-              <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 'clamp(36px, 5vw, 60px)', fontWeight: '700', letterSpacing: '-0.02em', margin: 0 }}>Nuestros Servicios</h2>
+              <div className="flow-kicker">Nuestros trabajos</div>
+              <h2 className="flow-title" style={{ marginTop: 8, fontSize: 'clamp(34px, 4.8vw, 60px)' }}>
+                CORTES CON SELLO
+              </h2>
             </div>
-            <Link to="/servicios" className="btn-ghost" style={{ fontSize: '12px', padding: '12px 24px' }}>Ver todos →</Link>
+
+            <a href={INSTAGRAM} target="_blank" rel="noreferrer" style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 8,
+              color: '#fff',
+              fontSize: 12,
+              fontWeight: 900,
+              letterSpacing: '.08em',
+              textTransform: 'uppercase',
+            }}>
+              Siguenos <InstagramIcon />
+            </a>
           </div>
 
-          <div className="servicios-home-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0' }}>
-            {[
-              { nombre: 'Corte Clásico',    desc: 'Tijera y máquina, lavado y peinado profesional.',  precio: '$28', duracion: '45 min', num: '01', icon: '✂' },
-              { nombre: 'Arreglo Barba',    desc: 'Escultura de barba con toalla caliente y aceites.', precio: '$18', duracion: '30 min', num: '02', icon: '🪒' },
-              { nombre: 'Afeitado Clásico', desc: 'Navaja recta, ritual de toalla caliente.',          precio: '$32', duracion: '45 min', num: '03', icon: '💈' },
-              { nombre: 'Combo Completo',   desc: 'Corte + barba. La experiencia completa.',           precio: '$42', duracion: '75 min', num: '04', icon: '👑' },
-            ].map((s, i) => (
-              <div key={s.nombre}
-                style={{ padding: '44px 32px', borderRight: i < 3 ? '1px solid #1a1a1a' : 'none', borderTop: '2px solid transparent', transition: 'all 0.3s', position: 'relative' }}
-                onMouseOver={e => { e.currentTarget.style.background = '#0f0f0f'; e.currentTarget.style.borderTopColor = gold; }}
-                onMouseOut={e  => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderTopColor = 'transparent'; }}
+          <div className="pipe-work-grid">
+            {trabajos.map((t, index) => (
+              <a
+                key={index}
+                href={INSTAGRAM}
+                target="_blank"
+                rel="noreferrer"
+                style={{
+                  position: 'relative',
+                  height: 190,
+                  borderRadius: 8,
+                  overflow: 'hidden',
+                  border: '1px solid rgba(183,255,0,.14)',
+                  background: '#0a0d08',
+                }}
               >
-                <div style={{ position: 'absolute', top: '16px', right: '20px', fontFamily: "'Playfair Display', serif", fontSize: '80px', fontWeight: '700', color: 'rgba(197,160,89,0.06)', lineHeight: '1', userSelect: 'none' }}>{s.num}</div>
-                <div style={{ fontSize: '28px', marginBottom: '20px' }}>{s.icon}</div>
-                <div style={{ fontFamily: "'Oswald', sans-serif", fontSize: '10px', letterSpacing: '0.25em', color: gold, textTransform: 'uppercase', marginBottom: '10px' }}>{s.duracion}</div>
-                <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: '20px', marginBottom: '12px', lineHeight: '1.2' }}>{s.nombre}</h3>
-                <p style={{ color: '#555', fontSize: '13px', lineHeight: '1.75', marginBottom: '28px' }}>{s.desc}</p>
-                <div style={{ width: '32px', height: '1px', background: gold, marginBottom: '16px' }} />
-                <div style={{ fontFamily: "'Playfair Display', serif", fontSize: '30px', fontWeight: '700', color: gold }}>{s.precio}</div>
-              </div>
+                <img
+                  src={t.src}
+                  alt={`Trabajo Elpipebarber ${index + 1}`}
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                    objectPosition: t.pos,
+                    filter: 'saturate(.85) contrast(1.08) brightness(.78)',
+                    transition: 'transform .45s ease',
+                  }}
+                  onMouseOver={(event) => {
+                    event.currentTarget.style.transform = 'scale(1.06)';
+                  }}
+                  onMouseOut={(event) => {
+                    event.currentTarget.style.transform = 'scale(1)';
+                  }}
+                />
+                <div style={{
+                  position: 'absolute',
+                  inset: 0,
+                  background: 'linear-gradient(0deg, rgba(0,0,0,.64), transparent 62%)',
+                }} />
+                <span style={{
+                  position: 'absolute',
+                  left: 14,
+                  bottom: 12,
+                  color: neon,
+                  fontSize: 12,
+                  fontWeight: 900,
+                  letterSpacing: '.08em',
+                  textTransform: 'uppercase',
+                }}>
+                  Flow #{index + 1}
+                </span>
+              </a>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ══ BARBEROS ══ */}
-      {barberos.length > 0 && (
-        <section style={{ background: '#050505' }}>
-          <div className="barberos-layout" style={{ display: 'grid', gridTemplateColumns: '220px 1fr', borderTop: '1px solid #111' }}>
-
-            <div style={{ borderRight: '1px solid #111', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', padding: '48px 32px' }}>
-              <div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '32px' }}>
-                  <div style={{ width: '20px', height: '1px', background: gold }} />
-                  <span style={{ fontFamily: "'Oswald', sans-serif", fontSize: '9px', letterSpacing: '0.4em', color: gold, textTransform: 'uppercase' }}>Equipo</span>
-                </div>
-                <div style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg)', fontFamily: "'Playfair Display', serif", fontSize: '11px', letterSpacing: '0.2em', color: '#2a2a2a', textTransform: 'uppercase', marginBottom: '0' }}>
-                  Los Maestros · Blade & Co.
-                </div>
-              </div>
-              <div style={{ fontFamily: "'Oswald', sans-serif", fontSize: '9px', letterSpacing: '0.2em', color: '#222', textTransform: 'uppercase' }}>
-                {barberos.length} barbers
-              </div>
-            </div>
-
+      <section style={{ padding: '46px 0 62px' }}>
+        <div className="flow-shell">
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'end',
+            gap: 18,
+            marginBottom: 28,
+            flexWrap: 'wrap',
+          }}>
             <div>
-              {barberos.map((b, idx) => {
-                const foto   = b.photoUrl || BARBER_FALLBACK_PHOTOS[idx % BARBER_FALLBACK_PHOTOS.length];
-                const num    = String(idx + 1).padStart(2, '0');
-                const isEven = idx % 2 === 0;
+              <div className="flow-kicker">Lo que dicen</div>
+              <h2 className="flow-title" style={{ marginTop: 8, fontSize: 'clamp(34px, 4.8vw, 60px)' }}>
+                OPINION REAL
+              </h2>
+            </div>
+            <a
+              href={`${INSTAGRAM}#comments`}
+              target="_blank"
+              rel="noreferrer"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 8,
+                color: neon,
+                fontSize: 12,
+                fontWeight: 900,
+                letterSpacing: '.08em',
+                textTransform: 'uppercase',
+                border: '1px solid rgba(183,255,0,.3)',
+                padding: '8px 14px',
+                textDecoration: 'none',
+              }}
+            >
+              <InstagramIcon /> Ver comentarios
+            </a>
+          </div>
 
-                return (
-                  <div key={b.id} className="barbero-fila"
-                    style={{
-                      display: 'grid',
-                      gridTemplateColumns: isEven ? '55% 45%' : '45% 55%',
-                      borderBottom: idx < barberos.length - 1 ? '1px solid #111' : 'none',
-                      height: '420px',
-                    }}
-                    onMouseOver={e => {
-                      e.currentTarget.querySelector('.rp').style.transform = 'scale(1.04)';
-                      e.currentTarget.querySelector('.rline').style.width  = '72px';
-                    }}
-                    onMouseOut={e => {
-                      e.currentTarget.querySelector('.rp').style.transform = 'scale(1)';
-                      e.currentTarget.querySelector('.rline').style.width  = '32px';
-                    }}
-                  >
-                    <div className="barbero-foto" style={{ order: isEven ? 0 : 1, position: 'relative', overflow: 'hidden' }}>
-                      <img className="rp" src={foto} alt={b.name}
-                        style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 15%', transition: 'transform 0.9s cubic-bezier(.2,.7,.2,1)', display: 'block' }}
-                      />
-                      <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.18)' }} />
-                      <div style={{ position: 'absolute', top: '20px', left: isEven ? 'auto' : '20px', right: isEven ? '20px' : 'auto', fontFamily: "'Playfair Display', serif", fontSize: '120px', fontWeight: '700', color: 'rgba(255,255,255,0.06)', lineHeight: '1', userSelect: 'none' }}>
-                        {num}
-                      </div>
-                    </div>
-
-                    <div className="barbero-info" style={{
-                      order: isEven ? 1 : 0,
-                      display: 'flex', flexDirection: 'column', justifyContent: 'center',
-                      padding: '52px 56px',
-                      borderLeft: isEven ? '1px solid #111' : 'none',
-                      borderRight: isEven ? 'none' : '1px solid #111',
-                      background: '#050505',
-                    }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px' }}>
-                        <span style={{ fontFamily: "'Playfair Display', serif", fontSize: '11px', color: gold }}>{num}</span>
-                        <div style={{ width: '20px', height: '1px', background: 'rgba(197,160,89,0.4)' }} />
-                        <span style={{ fontFamily: "'Oswald', sans-serif", fontSize: '9px', letterSpacing: '0.35em', color: gold, textTransform: 'uppercase' }}>{b.specialty}</span>
-                      </div>
-                      <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: 'clamp(28px, 4vw, 58px)', fontWeight: '700', color: '#F3F2EE', lineHeight: '0.95', letterSpacing: '-0.03em', marginBottom: '28px' }}>
-                        {b.name}
-                      </h3>
-                      <div className="rline" style={{ height: '1px', background: gold, width: '32px', marginBottom: '28px', transition: 'width 0.6s cubic-bezier(.2,.7,.2,1)' }} />
-                      {b.bio && <p style={{ color: '#555', fontSize: '13px', lineHeight: '1.85', marginBottom: '32px', maxWidth: '280px' }}>{b.bio}</p>}
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '32px' }}>
-                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={gold} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
-                        </svg>
-                        <span style={{ fontFamily: "'Oswald', sans-serif", fontSize: '10px', letterSpacing: '0.2em', color: '#3a3a3a', textTransform: 'uppercase' }}>
-                          {b.workStart} — {b.workEnd}
-                        </span>
-                      </div>
-                      <Link to="/reservar" style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', fontFamily: "'Oswald', sans-serif", fontSize: '10px', letterSpacing: '0.3em', textTransform: 'uppercase', color: gold, textDecoration: 'none', transition: 'gap 0.3s ease' }}
-                        onMouseOver={e => e.currentTarget.style.gap = '18px'}
-                        onMouseOut={e  => e.currentTarget.style.gap = '10px'}
-                      >
-                        Reservar con {b.name.split(' ')[0]}
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
-                        </svg>
-                      </Link>
+          <div className="pipe-testimonials">
+            {[
+              {
+                name: 'Rodrigo V.',
+                initials: 'RV',
+                color: '#1a2e0a',
+                text: 'Me fui con el fade más limpio que me han hecho. Felipe sabe leer lo que quieres sin que tengas que explicar mucho. Tremendo flow.',
+                tag: 'Fade + barba',
+              },
+              {
+                name: 'Camilo T.',
+                initials: 'CT',
+                color: '#0a1a2e',
+                text: 'Puntual, prolijo y con una atención diferente. El ambiente del local y la música hacen que el corte sea una experiencia completa.',
+                tag: 'Corte clásico',
+              },
+              {
+                name: 'Síguenos',
+                initials: null,
+                color: '#1a1a0a',
+                text: null,
+                tag: null,
+                cta: true,
+              },
+            ].map((r, i) => r.cta ? (
+              <article key={i} className="card" style={{
+                padding: 28,
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                alignItems: 'center',
+                minHeight: 180,
+                border: '1px solid rgba(183,255,0,.18)',
+                background: 'rgba(183,255,0,.03)',
+                textAlign: 'center',
+                gap: 14,
+              }}>
+                <div style={{ color: neon, fontSize: 32 }}>
+                  <InstagramIcon />
+                </div>
+                <p style={{ color: '#8d9484', fontSize: 13, lineHeight: 1.65 }}>
+                  Mira los comentarios reales de nuestros clientes en Instagram.
+                </p>
+                <a
+                  href={INSTAGRAM}
+                  target="_blank"
+                  rel="noreferrer"
+                  style={{
+                    display: 'inline-block',
+                    padding: '10px 20px',
+                    background: neon,
+                    color: '#030403',
+                    fontSize: 11,
+                    fontWeight: 900,
+                    letterSpacing: '.1em',
+                    textTransform: 'uppercase',
+                    textDecoration: 'none',
+                  }}
+                >
+                  Ver en Instagram →
+                </a>
+              </article>
+            ) : (
+              <article key={i} className="card" style={{ padding: 28, minHeight: 180 }}>
+                <div style={{
+                  color: neon,
+                  fontFamily: '"Bebas Neue", Impact, sans-serif',
+                  fontSize: 62,
+                  lineHeight: 0.65,
+                  marginBottom: 14,
+                  opacity: .7,
+                }}>
+                  "
+                </div>
+                <p style={{ color: '#c8d4be', lineHeight: 1.7, fontSize: 14, marginBottom: 22 }}>
+                  {r.text}
+                </p>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                  <div style={{
+                    width: 38,
+                    height: 38,
+                    borderRadius: '50%',
+                    background: r.color,
+                    border: '1.5px solid rgba(183,255,0,.3)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: 11,
+                    fontWeight: 900,
+                    color: neon,
+                    letterSpacing: '.05em',
+                    flexShrink: 0,
+                  }}>
+                    {r.initials}
+                  </div>
+                  <div>
+                    <strong style={{ display: 'block', color: '#fff', fontSize: 13 }}>{r.name}</strong>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 3 }}>
+                      <span style={{ color: neon, fontSize: 11 }}>★★★★★</span>
+                      <span style={{
+                        fontSize: 9,
+                        color: '#3d4438',
+                        fontWeight: 700,
+                        letterSpacing: '.08em',
+                        textTransform: 'uppercase',
+                        border: '1px solid #1e2519',
+                        padding: '2px 6px',
+                      }}>{r.tag}</span>
                     </div>
                   </div>
-                );
-              })}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* ══ SPLIT FILOSOFÍA ══ */}
-      <section style={{ background: '#080808', borderTop: '1px solid #161616' }}>
-        <div className="filosofia-grid" style={{ maxWidth: '1200px', margin: '0 auto', padding: '100px 24px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '80px', alignItems: 'center' }}>
-
-          <div style={{ position: 'relative' }}>
-            <img src={TOOLS_IMG} alt="Herramientas premium" style={{ width: '100%', borderRadius: '4px', border: '1px solid #1a1a1a', display: 'block' }} />
-            <div className="filosofia-badge" style={{ position: 'absolute', bottom: '-16px', right: '-16px', background: gold, color: '#0A0A0A', padding: '20px 24px', fontFamily: "'Oswald', sans-serif", fontSize: '12px', letterSpacing: '0.12em', textTransform: 'uppercase', fontWeight: '700', lineHeight: '1.5' }}>
-              10+ años<br />de experiencia
-            </div>
-          </div>
-
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '20px' }}>
-              <div style={{ width: '36px', height: '1px', background: gold }} />
-              <span style={{ fontFamily: "'Oswald', sans-serif", fontSize: '11px', letterSpacing: '0.35em', color: gold, textTransform: 'uppercase' }}>Nuestra filosofía</span>
-            </div>
-            <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 'clamp(30px, 4vw, 48px)', fontWeight: '700', lineHeight: '1.15', letterSpacing: '-0.02em', marginBottom: '24px' }}>
-              Las herramientas importan.<br />
-              <span style={{ color: gold, fontStyle: 'italic' }}>Las manos, más aún.</span>
-            </h2>
-            <p style={{ color: '#666', lineHeight: '1.9', fontSize: '14px', marginBottom: '16px' }}>
-              Cada navaja, peine y clipper tiene historia. Pero son los años de experiencia detrás de cada corte lo que convierte un servicio simple en un ritual que recordarás.
-            </p>
-            <p style={{ color: '#444', lineHeight: '1.9', fontSize: '14px', marginBottom: '40px' }}>
-              En {NOMBRE} no solo cortamos pelo — creamos una experiencia que te hace volver.
-            </p>
-            <Link to="/reservar" className="btn-gold" style={{ fontSize: '13px', padding: '14px 36px' }}>Reserva tu hora →</Link>
+                </div>
+              </article>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* ══ CTA FINAL ══ */}
-      <section style={{ position: 'relative', overflow: 'hidden', padding: '140px 24px', textAlign: 'center' }}>
-        <img src={HERO_IMG} alt="" aria-hidden="true"
-          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 30%', filter: 'blur(10px) brightness(0.12)' }}
-        />
-        <div className="cta-border" style={{ position: 'absolute', inset: '40px', border: `1px solid rgba(197,160,89,0.15)`, pointerEvents: 'none' }} />
-
-        <div style={{ position: 'relative', zIndex: 10, maxWidth: '580px', margin: '0 auto' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '16px', marginBottom: '24px' }}>
-            <div style={{ width: '36px', height: '1px', background: gold }} />
-            <span style={{ fontFamily: "'Oswald', sans-serif", fontSize: '11px', letterSpacing: '0.35em', color: gold, textTransform: 'uppercase' }}>¿Listo para el cambio?</span>
-            <div style={{ width: '36px', height: '1px', background: gold }} />
+      <section style={{
+        borderTop: '1px solid rgba(183,255,0,.14)',
+        borderBottom: '1px solid rgba(183,255,0,.14)',
+        background: 'linear-gradient(90deg, rgba(183,255,0,.09), rgba(255,255,255,.02), rgba(183,255,0,.06))',
+      }}>
+        <div className="flow-shell" style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: 24,
+          padding: '28px 0',
+          flexWrap: 'wrap',
+        }}>
+          <div>
+            <div className="flow-kicker">{SELLO}</div>
+            <h2 className="flow-title" style={{ marginTop: 6, fontSize: 'clamp(36px, 5vw, 66px)' }}>
+              LISTO PARA TU PROXIMO CORTE?
+            </h2>
+            {barberoPrincipal && (
+              <p style={{ marginTop: 8, color: 'var(--muted)' }}>
+                Reserva con {barberoPrincipal.name}.
+              </p>
+            )}
           </div>
-          <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 'clamp(44px, 7vw, 80px)', fontWeight: '700', letterSpacing: '-0.03em', lineHeight: '1', marginBottom: '24px' }}>
-            Reserva tu<br />
-            <span style={{ color: gold, fontStyle: 'italic' }}>cita hoy.</span>
-          </h2>
-          <p style={{ color: '#666', fontSize: '15px', lineHeight: '1.85', marginBottom: '44px' }}>
-            Elige tu barbero, selecciona el servicio y escoge el horario.<br />
-            Todo en menos de 2 minutos.
-          </p>
-          <Link to="/reservar" className="btn-gold" style={{ fontSize: '14px', padding: '18px 52px' }}>
-            Reservar ahora →
+
+          <Link to="/reservar" className="btn-neon" style={{ minWidth: 260 }}>
+            <CalendarIcon />
+            Reserva tu hora
           </Link>
         </div>
       </section>
-
     </div>
   );
 }
