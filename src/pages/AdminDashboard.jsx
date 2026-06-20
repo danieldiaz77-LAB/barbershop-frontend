@@ -26,6 +26,7 @@ const emptyBarber = {
   workEnd: '19:00',
   email: '',
   password: '',
+  phone: '',
 };
 
 const emptyService = {
@@ -269,6 +270,7 @@ export default function AdminDashboard() {
       bio: barber.bio || '',
       workStart: barber.workStart || '09:00',
       workEnd: barber.workEnd || '19:00',
+      phone: barber.phone || '',
     } : emptyBarber);
   };
 
@@ -277,13 +279,13 @@ export default function AdminDashboard() {
     try {
       if (!barberModal) {
         // Creating new barber: first create the login account, then the barber profile
-        const { email, password, name, specialty, photoUrl, bio, workStart, workEnd } = barberForm;
+        const { email, password, name, specialty, photoUrl, bio, workStart, workEnd, phone } = barberForm;
         if (!email || !password) {
           setError('El email y la contrasena son obligatorios para crear un barbero.');
           return;
         }
         // Create the user account with BARBER role — capture the new userId
-        const newUser = await usersApi.createBarber({ fullName: name, email, password, phone: '' });
+        const newUser = await usersApi.createBarber({ fullName: name, email, password, phone });
         // Then create the barber profile, linked to that userId
         const saved = await barbersApi.create({ name, specialty, photoUrl, bio, workStart, workEnd, userId: newUser.id });
         setBarberos((prev) => [...prev, saved]);
@@ -659,6 +661,9 @@ export default function AdminDashboard() {
               <label><span>Fin</span><input type="time" required value={barberForm.workEnd} onChange={(e) => setBarberForm({ ...barberForm, workEnd: e.target.value })} /></label>
             </div>
             <label><span>Bio</span><textarea rows={3} value={barberForm.bio} onChange={(e) => setBarberForm({ ...barberForm, bio: e.target.value })} /></label>
+            {!barberModal && (
+              <label><span>Telefono</span><input type="tel" required pattern="^\+?56\s?9\s?\d{4}\s?\d{4}$" value={barberForm.phone} onChange={(e) => setBarberForm({ ...barberForm, phone: e.target.value })} placeholder="+56 9 1234 5678" /></label>
+            )}
             {!barberModal && (
               <>
                 <div style={{ borderTop: '1px solid rgba(183,255,0,.13)', paddingTop: 14 }}>
